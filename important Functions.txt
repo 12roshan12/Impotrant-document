@@ -1,0 +1,27 @@
+# Impotrant-document
+
+
+////Function to convert Nepali Number to English (Index of For Loop)//////
+
+-----Under .ts-----
+np=['०', '१', '२', '३', '४', '५', '६', '७', '८', '९']
+
+getNepaliNumber(englishNumber){
+    if (englishNumber < 9) {
+        return this.np[englishNumber]
+    }else{
+        var tempNumber = englishNumber
+        var returnData = ''
+        while (tempNumber !=0) {
+            returnData = this.np[tempNumber%10] + returnData
+            tempNumber = Math.floor(tempNumber/10);
+        }
+        return returnData;
+    }
+}
+---------------------
+---Under HTML----
+
+getNepaliNumber (i)
+
+---------------------------------
