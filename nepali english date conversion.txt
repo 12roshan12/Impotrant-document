@@ -2,7 +2,7 @@ package required
 
 ***** npm i ad-bs-converter
 ***** npm i nepali-date-converter
-***** npm i angular-nepali-datepicker
+***** npm i angular-nepali-datepicker (refrence https://sprajwal078.github.io/angular-nepali-datepicker/)
 ***** npm i moment
 ***** npm i nepali-date
 ***** npm i tailwindcss
