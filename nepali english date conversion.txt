@@ -1,0 +1,159 @@
+package required 
+
+***** npm i ad-bs-converter
+***** npm i nepali-date-converter
+***** npm i angular-nepali-datepicker
+***** npm i moment
+***** npm i nepali-date
+***** npm i tailwindcss
+
+***************************TS FILE ******************************************************
+
+
+
+-----------------------IMPORTS------------------------------------
+import { ad2bs, convertDateToBS, convertDateToNepali, formattedEnglishDate } from "app/shared/data-utils";
+import * as adbs from "ad-bs-converter";
+
+--------------------------END-------------------------
+
+
+
+-------------------------DECLARATION-------------------------------
+
+  private convertDateToNepali = convertDateToNepali;
+  private convertDateToBS = convertDateToBS;
+  private ad2bs = ad2bs;
+  private formattedEnglishDate = formattedEnglishDate;
+  nepaliDate: any
+
+
+------------------------------END---------------------------
+
+
+
+
+
+ formatter: DateFormatter = (miti) => {
+    console.log(miti)
+    const y = miti.year.toString();
+    const m = miti.month + 1 >= 10 ? Number(Number(miti.month) + 1).toString() : '0' + Number(miti.month + 1);
+    const d = miti.day >= 10 ? miti.day.toString() : '0' + miti.day;
+    return `${y}.${m}.${d}`;
+  };
+
+
+  changeToEnglish() {
+    console.log(this.nepaliDate)
+    if (this.nepaliDate !== null) {
+      var np = this.nepaliDate.year + '/' + ((Number(this.nepaliDate.month) + 1 <= 9) ? '0' + (this.nepaliDate.month + 1) : (Number(this.nepaliDate.month) + 1)) + '/' + (this.nepaliDate.day <= 9 ? '0' + this.nepaliDate.day : this.nepaliDate.day);
+      var eng = adbs.bs2ad(np);
+      this.jvForm.controls.ndate.setValue(this.nepaliDate.year + '.' + ((Number(this.nepaliDate.month) + 1 <= 9) ? '0' + (this.nepaliDate.month + 1) : (Number(this.nepaliDate.month) + 1)) + '.' + (this.nepaliDate.day <= 9 ? '0' + this.nepaliDate.day : this.nepaliDate.day))
+      this.jvForm.controls.edate.setValue(eng.year + '-' + (eng.month <= 9 ? '0' + eng.month : eng.month) + '-' + (eng.day <= 9 ? '0' + eng.day : eng.day))
+    }
+  }
+
+
+  convertToNepali(engDate: any) {
+
+    var myDate = formatDate(new Date(), 'yyyy-MM-dd', 'en');
+    var english = new Date(engDate);
+    console.log(myDate)
+    console.log(engDate)
+    let validdate = engDate;
+    var english = new Date(validdate)
+    const date = this.formattedEnglishDate(english);
+    const eng = this.ad2bs(date);
+    var np = {
+      year: eng.year,
+      month: eng.month,
+      day: eng.day,
+    };
+    this.nepaliDate = `${eng.year}.${eng.month}.${eng.day}`;
+    console.log(this.nepaliDate)
+    this.jvForm.controls.ndate.setValue(this.nepaliDate);
+    this.nepaliDate = { year: eng.year, month: eng.month -1 , day: eng.day };
+    console.log(this.jvForm.controls.ndate)
+  }
+
+
+************************************************ END *********************************************************
+
+
+**************************************************HTML **********************************************************
+
+
+                                      <div class="mb-3">
+                                        <label class="block text-gray-700 text-sm font-bold mb-2" for="password">
+                                            {{ t("Eng Date") }}
+                                        </label>
+                                        <input
+                                            [ngClass]="jvForm.controls.edate.invalid  && submitted ? 'border-red-400'  : 'border-grey-400' "
+                                            (ngModelChange)="convertToNepali($event)" formControlName="edate"
+                                            placeholder="dd.mm.yyyy"                                
+                                            type="date" class="border rounded w-full py-2 px-3"  style="height: 35.5px;" />
+
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="block text-gray-700 text-sm font-bold mb-2" for="password">
+                                            {{ t("Nep Date") }}
+                                        </label>
+                                        <np-datepicker [(ngModel)]="nepaliDate"
+                                            [ngClass]="jvForm.controls.ndate.invalid  && submitted ? 'border-red-400'  : 'border-grey-400' "
+                                            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline datepicker__input"
+                                            language="en" (ngModelChange)="changeToEnglish()"
+                                            [ngModelOptions]="{ standalone: true }" name="nepaliDate"
+                                            [dateFormatter]="formatter">
+                                        </np-datepicker>
+                                    </div>
+
+***************************************************   END *******************************************************
+
+***********************************************data.util.ts**************************************
+import NepaliDate from 'nepali-date-converter'
+import * as adbs from "ad-bs-converter";
+
+export const convertDateToBS = (engDate: any): any => {
+  return new NepaliDate(engDate).getBS()
+}
+
+export const convertDateToNepali = (engDate: any): string => {
+  return formatDate(new NepaliDate(engDate).getBS(), '/');
+}
+
+export const convertDateToEng = (nepalidate: any): string => {
+  const nd = new NepaliDate(nepalidate.year, nepalidate.month, nepalidate.day)
+  console.log(nd.getAD());
+  return formatDate(nd.getAD(), '-');
+
+}
+
+export const formatDate = (miti: any, separator: string): string => {
+  const y = miti.year.toString();
+  const m = miti.month + 1 >= 10 ? (miti.month + 1).toString() : '0' + (miti.month + 1);
+  const d = miti.date >= 10 ? miti.date.toString() : '0' + miti.date;
+  return y + separator + m + separator + d;
+
+}
+export const formattedEnglishDate = (date: Date): string => {
+  const datePart = date.getDate();
+  const monthPart = date.getMonth() + 1;
+  const yearPart = date.getFullYear();
+
+  return (yearPart) + '/' + (monthPart < 10 ? '0' + monthPart : monthPart) + '/' + (datePart < 10 ? '0' + datePart : datePart);
+
+}
+
+export const ad2bs = (date: any) => {
+  const nep = adbs.ad2bs(date);
+  return nep.en;
+}
+export const bs2ad = (date: any) => {
+  let edate = date.year + '/' + ((date.month) <= 9 ? '0' + (Number(date.month) + 1) : (Number(date.month) + 1)) + '/' + (date.day <= 9 ? '0' + date.day : date.day);
+  var eng = adbs.bs2ad(edate);
+
+  return eng;
+}
+
+
+******************************END********************************************
